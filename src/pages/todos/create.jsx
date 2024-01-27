@@ -7,7 +7,8 @@ import { object } from "yup"
 
 const initialValues = {
   description: "",
-  categoryId: 40,
+  categoryId: 1,
+  userId: 1,
 }
 const validationSchema = object({
   description: todoDescriptionValidator.label("Description"),

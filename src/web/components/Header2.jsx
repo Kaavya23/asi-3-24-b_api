@@ -1,14 +1,15 @@
+// Header.js
+import React from "react"
 import { useSession } from "@/web/components/SessionContext"
 import Button from "@/web/components/ui/Button"
 import Link from "@/web/components/ui/Link"
+import {
+  AdminMenu,
+  UserMenu,
+  MenuItem,
+} from "@/web/components/ui/MenuComponents"
 
-const MenuItem = ({ children, href, ...otherProps }) => (
-  <li {...otherProps}>
-    <Link styless href={href}>
-      {children}
-    </Link>
-  </li>
-)
+
 const Header = () => {
   const { session, signOut } = useSession()
 
@@ -24,11 +25,7 @@ const Header = () => {
           <ul className="flex h-full gap-4 items-center">
             {session ? (
               <>
-                <MenuItem href="/">List todos</MenuItem>
-                <MenuItem href="/todos/create">Create todo</MenuItem>
-                <MenuItem href="/posts/create">Create post</MenuItem>
-                <MenuItem href="/posts">List posts</MenuItem>
-                <MenuItem href="/profil">Profil</MenuItem>
+                {session.isAdmin ? <AdminMenu /> : <UserMenu />}
                 <li>
                   <Button
                     variant="transparent"

@@ -9,3 +9,5 @@ export const up = async (db) => {
 export const down = async (db) => {
   await db.schema.dropTable("todos")
 }
+
+//npx knex migrate: make nomdufichier

@@ -16,6 +16,7 @@ export const down = async (db) => {
     table.text("description").nullable().alter()
     table.boolean("isDone").nullable().defaultTo(null).alter()
     table.dropColumn("categoryId")
+    table.dropColumn("userId")
   })
   await db.schema.dropTable("categories")
 }

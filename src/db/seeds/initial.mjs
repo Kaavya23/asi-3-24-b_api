@@ -4,13 +4,19 @@ export const seed = async (db) => {
   await db("todos").delete()
   await db("categories").delete()
   await db("users").delete()
-  await db("users").insert(
-    [...Array(5)].map(() => ({
-      email: faker.internet.email(),
-      passwordHash: "alskdjalsdkjasdlkj",
-      passwordSalt: "alskdjalsdkjasdlkj",
-    })),
-  )
+
+
+  const users = await db("users")
+    .insert(
+      [...Array(5)].map(() => ({
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        passwordHash: "alskdjalsdkjasdlkj",
+        passwordSalt: "alskdjalsdkjasdlkj",
+        isAdmin: faker.number.int({ min: 1, max: 30 }) % 7 === 0,
+      })),
+    )
+    .returning("*")
   const categories = await db("categories")
     .insert(
       [...new Array(30)].map(() => ({
@@ -24,6 +30,7 @@ export const seed = async (db) => {
       isDone: faker.number.int({ min: 1, max: 30 }) % 7 === 0,
       categoryId:
         categories[faker.number.int({ min: 0, max: categories.length - 1 })].id,
+      userId: users[faker.number.int({ min: 0, max: users.length - 1 })].id,
     })),
   )
 }

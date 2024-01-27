@@ -10,7 +10,7 @@ import {
 const handle = mw({
   GET: [
     validate({
-      query: {
+      query: { // récupérer le todoId de l'url (donc celui qui est entre crochet)
         todoId: idValidator,
       },
     }),
@@ -21,7 +21,8 @@ const handle = mw({
       },
       res,
     }) => {
-      const todo = await TodoModel.query().findById(todoId).throwIfNotFound()
+      const todo = await TodoModel.query().findById(todoId).throwIfNotFound() //query() sert à créer une requête sql
+      // throwIfNotFound() arrête la requête s'il ne le trouve pas
 
       res.send(todo)
     },
@@ -79,5 +80,7 @@ const handle = mw({
     },
   ],
 })
+
+// pour un TODO
 
 export default handle

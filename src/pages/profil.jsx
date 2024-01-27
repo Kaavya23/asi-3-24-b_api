@@ -1,53 +1,40 @@
-import {
-  emailValidator,
-  passwordValidator,
-  usernameValidator,
-} from "@/utils/validators"
-import Alert from "@/web/components/ui/Alert"
+import { emailValidator, passwordValidator } from "@/utils/validators"
+import { useSession } from "@/web/components/SessionContext"
+import ErrorMessage from "@/web/components/ui/ErrorMessage"
 import Form from "@/web/components/ui/Form"
 import FormField from "@/web/components/ui/FormField"
-import Link from "@/web/components/ui/Link"
 import SubmitButton from "@/web/components/ui/SubmitButton"
 import apiClient from "@/web/services/apiClient"
 import { useMutation } from "@tanstack/react-query"
 import { Formik } from "formik"
+import { useRouter } from "next/router"
 import { object } from "yup"
 
 const initialValues = {
   email: "",
   password: "",
-  username: "",}
+}
 const validationSchema = object({
   email: emailValidator.label("E-mail"),
   password: passwordValidator.label("Password"),
-  username: usernameValidator.label("Username"),
 })
 const SignUpPage = () => {
-  const { isSuccess, mutateAsync } = useMutation({
-    mutationFn: (values) => apiClient.post("/users", values),
+  const router = useRouter()
+  const { saveSessionToken } = useSession()
+  const { mutateAsync, error } = useMutation({
+    mutationFn: (values) => apiClient.post("/sessions", values),
   })
   const handleSubmit = async (values) => {
-    await mutateAsync(values)
+    const { result: jwt } = await mutateAsync(values)
 
-    return true
-  }
+    saveSessionToken(jwt)
 
-  if (isSuccess) {
-    return (
-      <div className="flex flex-col gap-4">
-        <Alert>
-          We just sent you an e-mail. Please use the provided link to validate
-          your account ❤️
-        </Alert>
-        <p>
-          <Link href="/sign-in">Go to sign-in page.</Link>
-        </p>
-      </div>
-    )
+    router.push("/")
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
+      <ErrorMessage error={error} />
       <Formik
         validationSchema={validationSchema}
         initialValues={initialValues}
@@ -66,14 +53,11 @@ const SignUpPage = () => {
             placeholder="Enter your password"
             label="Password"
           />
-          <FormField
-            name="username"
-            type="text"
-            placeholder="Enter a valid username"
-            label="Username"
-          />
-          <SubmitButton>Sign Up</SubmitButton>
+          <SubmitButton>Sign In</SubmitButton>
         </Form>
-      </Formik></>)}
+      </Formik>
+    </div>
+  )
+}
 
 export default SignUpPage

@@ -1,6 +1,10 @@
 import { validate } from "@/api/middlewares/validate"
 import mw from "@/api/mw"
-import { emailValidator, passwordValidator } from "@/utils/validators"
+import {
+  emailValidator,
+  passwordValidator,
+  usernameValidator,
+} from "@/utils/validators"
 
 const handle = mw({
   POST: [
@@ -8,16 +12,17 @@ const handle = mw({
       body: {
         email: emailValidator,
         password: passwordValidator,
+        username: usernameValidator,
       },
     }),
     async ({
       input: {
-        body: { email, password },
+        body: { email, password, username },
       },
       models: { UserModel },
       res,
     }) => {
-      const user = await UserModel.query().findOne({ email })
+      const user = await UserModel.query().findOne({ email, username })
 
       if (user) {
         res.send({ result: true })
@@ -32,6 +37,7 @@ const handle = mw({
         email,
         passwordHash,
         passwordSalt,
+        username,
       })
 
       res.send({ result: true })

@@ -4,37 +4,37 @@ import mw from "@/api/mw"
 import {
   idValidator,
   pageValidator,
-  statusValidator,
-  todoDescriptionValidator,
+  postsContentValidator,
+  postsTitleValidator
 } from "@/utils/validators"
 import config from "@/web/config"
 
 const handle = mw({
   POST: [
-    //auth,
+    auth,
     validate({
       body: {
-        description: todoDescriptionValidator,
-        categoryId: idValidator, // ici mettre userId
-        isDone: statusValidator.optional(),
+        title: postsTitleValidator,
+        content: postsContentValidator,
+        authorId: idValidator,
       },
     }),
     async ({
-      models: { TodoModel },
+      models: { PostModel },
       input: {
-        body: { description, categoryId, isDone },
+        body: { title, content, authorId },
       },
-      res, //response => quand on envoie une requête (ici post), on reçoit une réponse
+      res,
     }) => {
-      const todo = await TodoModel.query()
+      const post = await PostModel.query()
         .insertAndFetch({
-          description,
-          categoryId,
-          isDone,
+          title,
+          content,
+          authorId,
         })
-        .withGraphFetched("category")
+        .withGraphFetched("user")
 
-      res.send(todo)
+      res.send(post)
     },
   ],
   GET: [
@@ -45,22 +45,22 @@ const handle = mw({
     }),
     async ({
       res,
-      models: { TodoModel },
+      models: { PostModel },
       input: {
         query: { page },
       },
     }) => {
-      const query = TodoModel.query()
-      const todos = await query
+      const query = PostModel.query()
+      const posts = await query
         .clone()
-        .withGraphFetched("category")
+        .withGraphFetched("user")
         .orderBy("createdAt", "DESC")
         .limit(config.ui.itemsPerPage)
         .offset((page - 1) * config.ui.itemsPerPage)
       const [{ count }] = await query.clone().count()
 
       res.send({
-        result: todos,
+        result: posts,
         meta: {
           count,
         },
